@@ -106,11 +106,6 @@ public final class CameraUtils {
       int cameraId;
       try {
         cameraId = Integer.parseInt(cameraName, 10);
-        CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(cameraName);
-//                val i = characteristics.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-          System.out.println("WTH -> Physical Cameras: " + String.join(", ", characteristics.getPhysicalCameraIds()));
-        }
       } catch (NumberFormatException e) {
         cameraId = -1;
       }
@@ -125,48 +120,13 @@ public final class CameraUtils {
       details.put("name", cameraName);
       int sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
       details.put("sensorOrientation", sensorOrientation);
+
+      // For Android versions high enough, we get physical cameras and return them to optionally be used
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
         Set<String> physicalCameraIds = characteristics.getPhysicalCameraIds();
         ArrayList<HashMap<String, Object>> physicalIdsList = new ArrayList<>();
         for (String physicalId : physicalCameraIds) {
           CameraCharacteristics physicalChars = cameraManager.getCameraCharacteristics(physicalId);
-
-          ArrayList<String> characteristicsStrings = new ArrayList<String>();
-          for (CameraCharacteristics.Key<?> key:
-                  physicalChars.getKeys()) {
-            String toAdd = "";
-            toAdd += key.toString();
-            toAdd += ": ";
-            if (key == CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS) {
-              float[] focalLengths = physicalChars.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
-              toAdd += "[";
-              for (float l :
-                      focalLengths) {
-                toAdd += l + ", ";
-              }
-              toAdd += "]\n";
-            } else if (key == CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES) {
-              float[] focalLengths = physicalChars.get(CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES);
-              toAdd += "[";
-              for (float l :
-                      focalLengths) {
-                toAdd += l + ", ";
-              }
-              toAdd += "]\n";
-            } else if (key == CameraCharacteristics.COLOR_CORRECTION_AVAILABLE_ABERRATION_MODES) {
-              int[] focalLengths = physicalChars.get(CameraCharacteristics.COLOR_CORRECTION_AVAILABLE_ABERRATION_MODES);
-              toAdd += "[";
-              for (float l :
-                      focalLengths) {
-                toAdd += l + ", ";
-              }
-              toAdd += "]\n";
-            }
-            toAdd += physicalChars.get(key).toString();
-            characteristicsStrings.add(toAdd);
-          }
-
-
 
           HashMap<String, Object> physicalCameraDetails = new HashMap<>();
 
@@ -181,8 +141,6 @@ public final class CameraUtils {
           }
           physicalCameraDetails.put("id", physicalId);
           physicalIdsList.add(physicalCameraDetails);
-
-          System.out.println("WTH --> " + physicalId + ": Here's my characteristics: " + String.join("\n ", characteristicsStrings));
         }
 
         details.put("physicalCameras", physicalIdsList);

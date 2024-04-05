@@ -54,3 +54,5 @@ DeviceOrientation deserializeDeviceOrientation(String str) {
       throw ArgumentError('"$str" is not a valid DeviceOrientation value');
   }
 }
+
+T? cast<T>(x) => x is T ? x : null;

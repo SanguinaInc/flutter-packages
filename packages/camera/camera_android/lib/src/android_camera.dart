@@ -9,6 +9,7 @@ import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:logging/logging.dart';
 import 'package:stream_transform/stream_transform.dart';
 
 import 'android_cam_description.dart';
@@ -25,6 +26,8 @@ class AndroidCamera extends CameraPlatform {
   }
 
   final Map<int, MethodChannel> _channels = <int, MethodChannel>{};
+
+  final log = Logger("AndroidCamera");
 
   /// The name of the channel that device events from the platform side are
   /// sent on.
@@ -95,7 +98,7 @@ class AndroidCamera extends CameraPlatform {
   }) async {
     try {
       cameraDescription = cameraDescription as AndroidCameraDescription;
-      print("WTH --> Creating camera with ${cameraDescription}");
+      log.info('Creating camera with ${cameraDescription}');
       final Map<String, dynamic>? reply = await _channel.invokeMapMethod<String, dynamic>('create', <String, dynamic>{
         'cameraName': cameraDescription.name,
         'physicalCameraId': cameraDescription.selectedPhysicalCamera,
@@ -612,14 +615,12 @@ class AndroidCamera extends CameraPlatform {
 
   List<PhysicalCameraDescription> parsePhysicalCameras(List<Object?> camera) {
     return camera.map((m) {
-      print("WTH -> m1 = ${m}");
       m = (m as Map<Object?, Object?>).cast<String, dynamic>();
-      print("WTH -> m2 = ${m}");
       return PhysicalCameraDescription(
         id: m['id']! as String,
-        minZoom: m['minZoom']! as double,
-        maxZoom: m['maxZoom'] as double,
-        aperture: m['aperture'] as double,
+        minZoom: cast<double>(m['minZoom']),
+        maxZoom: cast<double>(m['maxZoom']),
+        aperture: cast<double>(m['aperture']),
       );
     }).toList();
   }

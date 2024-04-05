@@ -21,6 +21,7 @@ flutter:
 dependencies:
   camera_platform_interface:
     path: ../camera_platform_interface
+  logging: ^1.2.0
   flutter:
     sdk: flutter
   flutter_plugin_android_lifecycle: ^2.0.2

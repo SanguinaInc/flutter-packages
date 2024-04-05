@@ -168,10 +168,10 @@ class Camera
     public CaptureRequest.Builder createCaptureRequest(int templateType)
             throws CameraAccessException {
       if (VERSION.SDK_INT >= 28 && physicalCameraId != null) {
-        System.out.println("WTH --> Trying to user physical camera");
+        Log.d(TAG, "Create capture request with physical camera " + physicalCameraId);
         return cameraDevice.createCaptureRequest(templateType, Collections.singleton(physicalCameraId));
       } else {
-        System.out.println("WTH --> Defaulting to use logical camera");
+        Log.d(TAG, "Create capture request with logical camera");
         return cameraDevice.createCaptureRequest(templateType);
       }
     }
@@ -326,17 +326,14 @@ class Camera
 
     // Open the camera.
     CameraManager cameraManager = CameraUtils.getCameraManager(activity);
-    System.out.println("WTH -> Opening Camera: " + cameraProperties.getCameraName());
     cameraManager.openCamera(
             cameraProperties.getCameraName(),
             new CameraDevice.StateCallback() {
               @Override
               public void onOpened(@NonNull CameraDevice device) {
-                System.out.println("WTH -> Opened Camera: " + cameraProperties.getCameraName());
                 cameraDevice = new DefaultCameraDeviceWrapper(device);
                 try {
                   startPreview();
-                  System.out.println("WTH -> Started Preview: " + cameraProperties.getCameraName());
                   if (!recordingVideo) { // only send initialization if we werent already recording and switching cameras
                     dartMessenger.sendCameraInitializedEvent(
                             resolutionFeature.getPreviewSize().getWidth(),
@@ -358,7 +355,6 @@ class Camera
               @Override
               public void onClosed(@NonNull CameraDevice camera) {
                 Log.i(TAG, "open | onClosed");
-                System.out.println("WTH -> Closed Camera: " + cameraProperties.getCameraName());
 
                 // Prevents calls to methods that would otherwise result in IllegalStateException
                 // exceptions.
@@ -480,6 +476,7 @@ class Camera
     // TODO: I don't think we'll have physical camera id by this point? Maybe we will...
     // Start the session.
     if (VERSION.SDK_INT >= VERSION_CODES.P && physicalCameraId != null) {
+      Log.i(TAG, "Setting up surfaces for physical camera");
       // Collect all surfaces to render to.
       List<OutputConfiguration> configs = new ArrayList<>();
 
@@ -489,12 +486,12 @@ class Camera
       for (Surface surface : remainingSurfaces) {
         OutputConfiguration config = new OutputConfiguration(surface);
         config.setPhysicalCameraId(physicalCameraId);
-        System.out.println("WTH --> Set Physical Camera ID");
         configs.add(config);
       }
       createCaptureSessionWithSessionConfig(configs, callback);
       previewRequestBuilder = cameraDevice.createCaptureRequest(templateType);
     } else {
+      Log.i(TAG, "Setting up surfaces for logical camera");
       // Collect all surfaces to render to.
       List<Surface> surfaceList = new ArrayList<>();
       surfaceList.add(flutterSurface);
@@ -509,7 +506,6 @@ class Camera
       }
     }
     previewRequestBuilder.addTarget(flutterSurface);
-    System.out.println("WTH --> Using: " + previewRequestBuilder.hashCode());
   }
 
   @TargetApi(VERSION_CODES.P)
@@ -546,7 +542,6 @@ class Camera
 
     try {
       if (!pausedPreview) {
-        System.out.println("WTH --> Setting repeating request: " + previewRequestBuilder.hashCode());
         captureSession.setRepeatingRequest(
                 previewRequestBuilder.build(), cameraCaptureCallback, backgroundHandler);
       }
