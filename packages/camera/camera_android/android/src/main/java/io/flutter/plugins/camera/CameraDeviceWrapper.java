@@ -15,6 +15,7 @@ import android.view.Surface;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import java.util.List;
+import java.util.Set;
 
 /** A mockable wrapper for CameraDevice calls. */
 interface CameraDeviceWrapper {

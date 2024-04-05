@@ -10,12 +10,16 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
+import android.os.Build;
+import android.util.Range;
+
 import androidx.annotation.NonNull;
 import io.flutter.embedding.engine.systemchannels.PlatformChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /** Provides various utilities for camera. */
 public final class CameraUtils {
@@ -102,6 +106,11 @@ public final class CameraUtils {
       int cameraId;
       try {
         cameraId = Integer.parseInt(cameraName, 10);
+        CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(cameraName);
+//                val i = characteristics.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+          System.out.println("WTH -> Physical Cameras: " + String.join(", ", characteristics.getPhysicalCameraIds()));
+        }
       } catch (NumberFormatException e) {
         cameraId = -1;
       }
@@ -110,10 +119,74 @@ public final class CameraUtils {
       }
 
       HashMap<String, Object> details = new HashMap<>();
+
       CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(cameraName);
+
       details.put("name", cameraName);
       int sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
       details.put("sensorOrientation", sensorOrientation);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        Set<String> physicalCameraIds = characteristics.getPhysicalCameraIds();
+        ArrayList<HashMap<String, Object>> physicalIdsList = new ArrayList<>();
+        for (String physicalId : physicalCameraIds) {
+          CameraCharacteristics physicalChars = cameraManager.getCameraCharacteristics(physicalId);
+
+          ArrayList<String> characteristicsStrings = new ArrayList<String>();
+          for (CameraCharacteristics.Key<?> key:
+                  physicalChars.getKeys()) {
+            String toAdd = "";
+            toAdd += key.toString();
+            toAdd += ": ";
+            if (key == CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS) {
+              float[] focalLengths = physicalChars.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
+              toAdd += "[";
+              for (float l :
+                      focalLengths) {
+                toAdd += l + ", ";
+              }
+              toAdd += "]\n";
+            } else if (key == CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES) {
+              float[] focalLengths = physicalChars.get(CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES);
+              toAdd += "[";
+              for (float l :
+                      focalLengths) {
+                toAdd += l + ", ";
+              }
+              toAdd += "]\n";
+            } else if (key == CameraCharacteristics.COLOR_CORRECTION_AVAILABLE_ABERRATION_MODES) {
+              int[] focalLengths = physicalChars.get(CameraCharacteristics.COLOR_CORRECTION_AVAILABLE_ABERRATION_MODES);
+              toAdd += "[";
+              for (float l :
+                      focalLengths) {
+                toAdd += l + ", ";
+              }
+              toAdd += "]\n";
+            }
+            toAdd += physicalChars.get(key).toString();
+            characteristicsStrings.add(toAdd);
+          }
+
+
+
+          HashMap<String, Object> physicalCameraDetails = new HashMap<>();
+
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Range zoomRange = physicalChars.get(CameraCharacteristics.CONTROL_ZOOM_RATIO_RANGE);
+            physicalCameraDetails.put("minZoom", zoomRange.getLower());
+            physicalCameraDetails.put("maxZoom", zoomRange.getUpper());
+          }
+          float[] apertures = physicalChars.get(CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES);
+          if (apertures.length > 0) {
+            physicalCameraDetails.put("aperture", apertures[0]);
+          }
+          physicalCameraDetails.put("id", physicalId);
+          physicalIdsList.add(physicalCameraDetails);
+
+          System.out.println("WTH --> " + physicalId + ": Here's my characteristics: " + String.join("\n ", characteristicsStrings));
+        }
+
+        details.put("physicalCameras", physicalIdsList);
+      }
 
       int lensFacing = characteristics.get(CameraCharacteristics.LENS_FACING);
       switch (lensFacing) {

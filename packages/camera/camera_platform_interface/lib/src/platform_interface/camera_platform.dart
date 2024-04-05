@@ -46,6 +46,17 @@ abstract class CameraPlatform extends PlatformInterface {
     throw UnimplementedError('availableCameras() is not implemented.');
   }
 
+  /// Prepare the capture session for Android Camera2 physical cameras.
+  ///
+  /// Use of this method is optional, but must be called prior to starting the stream.
+  /// 
+  /// This operation is a no-op on iOS.
+  ///
+  /// Throws a [CameraException] if the prepare fails.
+  Future<void> setPhysicalCameraId(String cameraId) async {
+    await CameraPlatform.instance.setPhysicalCameraId(cameraId);
+  }
+
   /// Creates an uninitialized camera instance and returns the cameraId.
   Future<int> createCamera(
     CameraDescription cameraDescription,
