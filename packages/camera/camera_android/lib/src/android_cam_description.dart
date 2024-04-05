@@ -14,7 +14,7 @@ class AndroidCameraDescription extends CameraDescription {
 
   @override
   String toString() {
-    return 'CameraDescription($name, $lensDirection, $sensorOrientation, ${physicalCameras})';
+    return 'AndroidCameraDescription($name, $lensDirection, $sensorOrientation, ${selectedPhysicalCamera}, ${physicalCameras})';
   }
 }
 

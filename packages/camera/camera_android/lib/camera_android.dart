@@ -3,3 +3,4 @@
 // found in the LICENSE file.
 
 export 'src/android_camera.dart';
+export 'src/android_cam_description.dart';

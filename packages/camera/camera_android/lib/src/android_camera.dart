@@ -95,9 +95,10 @@ class AndroidCamera extends CameraPlatform {
   }) async {
     try {
       cameraDescription = cameraDescription as AndroidCameraDescription;
+      print("WTH --> Creating camera with ${cameraDescription}");
       final Map<String, dynamic>? reply = await _channel.invokeMapMethod<String, dynamic>('create', <String, dynamic>{
         'cameraName': cameraDescription.name,
-        'physicalCamera': cameraDescription.selectedPhysicalCamera,
+        'physicalCameraId': cameraDescription.selectedPhysicalCamera,
         'resolutionPreset': resolutionPreset != null ? _serializeResolutionPreset(resolutionPreset) : null,
         'enableAudio': enableAudio,
       });
