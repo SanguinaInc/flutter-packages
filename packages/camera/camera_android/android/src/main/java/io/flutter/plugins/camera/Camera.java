@@ -473,7 +473,6 @@ class Camera
               }
             };
 
-    // TODO: I don't think we'll have physical camera id by this point? Maybe we will...
     // Start the session.
     if (VERSION.SDK_INT >= VERSION_CODES.P && physicalCameraId != null) {
       Log.i(TAG, "Setting up surfaces for physical camera");
