@@ -146,6 +146,57 @@ public final class CameraUtils {
         details.put("physicalCameras", physicalIdsList);
       }
 
+
+
+
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        Set<String> physicalCameraIds = characteristics.getPhysicalCameraIds();
+        ArrayList<HashMap<String, Object>> physicalIdsList = new ArrayList<>();
+        for (String physicalId : physicalCameraIds) {
+          CameraCharacteristics physicalChars = cameraManager.getCameraCharacteristics(physicalId);
+
+          ArrayList<String> characteristicsStrings = new ArrayList<String>();
+          for (CameraCharacteristics.Key<?> key:
+                  physicalChars.getKeys()) {
+            String toAdd = "";
+            toAdd += key.toString();
+            toAdd += ": ";
+            if (key == CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS) {
+              float[] focalLengths = physicalChars.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
+              toAdd += "[";
+              for (float l :
+                      focalLengths) {
+                toAdd += l + ", ";
+              }
+              toAdd += "]\n";
+            } else if (key == CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES) {
+              float[] focalLengths = physicalChars.get(CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES);
+              toAdd += "[";
+              for (float l :
+                      focalLengths) {
+                toAdd += l + ", ";
+              }
+              toAdd += "]\n";
+            } else if (key == CameraCharacteristics.COLOR_CORRECTION_AVAILABLE_ABERRATION_MODES) {
+              int[] focalLengths = physicalChars.get(CameraCharacteristics.COLOR_CORRECTION_AVAILABLE_ABERRATION_MODES);
+              toAdd += "[";
+              for (float l :
+                      focalLengths) {
+                toAdd += l + ", ";
+              }
+              toAdd += "]\n";
+            }
+            toAdd += physicalChars.get(key).toString();
+            characteristicsStrings.add(toAdd);
+          }
+
+          System.out.println("WTH --> " + physicalId + ": Here's my characteristics: " + String.join("\n ", characteristicsStrings));
+        }
+      }
+
+
+
+
       int lensFacing = characteristics.get(CameraCharacteristics.LENS_FACING);
       switch (lensFacing) {
         case CameraMetadata.LENS_FACING_FRONT:
