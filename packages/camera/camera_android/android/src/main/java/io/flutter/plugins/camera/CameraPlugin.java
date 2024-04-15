@@ -34,7 +34,9 @@ public final class CameraPlugin implements FlutterPlugin, ActivityAware {
    *
    * <p>See {@code io.flutter.plugins.camera.MainActivity} for an example.
    */
-  public CameraPlugin() {}
+  public CameraPlugin() {
+
+  }
 
   /**
    * Registers a plugin implementation that uses the stable {@code io.flutter.plugin.common}
@@ -46,6 +48,7 @@ public final class CameraPlugin implements FlutterPlugin, ActivityAware {
   @SuppressWarnings("deprecation")
   public static void registerWith(
       @NonNull io.flutter.plugin.common.PluginRegistry.Registrar registrar) {
+    System.out.println("WTF -> Why is this one registering?");
     CameraPlugin plugin = new CameraPlugin();
     plugin.maybeStartListening(
         registrar.activity(),

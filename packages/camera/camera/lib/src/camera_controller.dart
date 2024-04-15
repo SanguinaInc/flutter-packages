@@ -353,6 +353,7 @@ class CameraController extends ValueNotifier<CameraValue> {
     } finally {
       initializeCompleter.complete();
     }
+    return _initializeFuture;
   }
 
   /// Prepare the capture session for video recording.
